@@ -32,13 +32,14 @@ var config = {
     }
 };
 
-var player;
 var Car1;
 var Car2;
 var Car3;
 var Car4;
 var Car5;
 var Car6,
+var parcours;
+var environment;
 var cursors;
 var score = 0;
 var gameOver = false;
@@ -48,20 +49,18 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
-    this.load.image('sky', 'assets/sky.png');
-    this.load.image('ground', 'assets/platform.png');
-    this.load.image('star', 'assets/star.png');
-    this.load.image('bomb', 'assets/bomb.png');
+    this.load.image('course', 'assets/course.png');
+    this.load.image('environment', 'assets/environment.png')
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
 }
 
 function create ()
 {
     //  A simple background for our game
-    this.add.image(400, 300, 'sky');
+    this.add.image(400, 300, 'environment');
 
     //  The platforms group contains the ground and the 2 ledges we can jump on
-    platforms = this.physics.add.staticGroup();
+    parcours = this.physics.add.staticGroup();
 
     //  Here we create the ground.
     //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
@@ -73,7 +72,7 @@ function create ()
     platforms.create(750, 220, 'ground');
 
     // The player and its settings
-    player = this.physics.add.sprite(100, 450, 'dude');
+    car1 = this.physics.add.sprite(100, 450, '');
 
     //  Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0.2);
@@ -142,21 +141,21 @@ function update ()
 
     if (cursors.left.isDown)
     {
-        player.setVelocityX(-160);
+        car1.setVelocityX(-160);
 
-        player.anims.play('left', true);
+        car1.anims.play('left', true);
     }
     else if (cursors.right.isDown)
     {
-        player.setVelocityX(160);
+        car1.setVelocityX(160);
 
-        player.anims.play('right', true);
+        car1.anims.play('right', true);
     }
     else
     {
-        player.setVelocityX(0);
+        car1.setVelocityX(0);
 
-        player.anims.play('turn');
+        car1.anims.play('turn');
     }
 
     if (cursors.up.isDown && player.body.touching.down)
@@ -165,44 +164,6 @@ function update ()
     }
 }
 
-function collectStar (player, star)
-{
-    star.disableBody(true, true);
-
-    //  Add and update the score
-    score += 10;
-    scoreText.setText('Score: ' + score);
-
-    if (stars.countActive(true) === 0)
-    {
-        //  A new batch of stars to collect
-        stars.children.iterate(function (child) {
-
-            child.enableBody(true, child.x, 0, true, true);
-
-        });
-
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        var bomb = bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bomb.allowGravity = false;
-
-    }
-}
-
-function hitBomb (player, bomb)
-{
-    this.physics.pause();
-
-    player.setTint(0xff0000);
-
-    player.anims.play('turn');
-
-    gameOver = true;
-}
 
 </script>
 
